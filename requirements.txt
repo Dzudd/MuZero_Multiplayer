@@ -1,7 +1,10 @@
 gym[classic_control]
-nevergrad
-numpy
-ray
-seaborn
+nevergrad~=0.11.0
+numpy~=1.25.2
+ray~=2.6.1
+seaborn~=0.12.2
 tensorboard
-torch
+torch~=2.0.1
+
+PyYAML~=6.0.1
+matplotlib~=3.7.2

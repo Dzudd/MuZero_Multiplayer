@@ -6,6 +6,7 @@ import pathlib
 import pickle
 import sys
 import time
+import pkgutil
 
 import nevergrad
 import numpy
@@ -26,17 +27,19 @@ class MuZero:
     Main class to manage MuZero.
 
     Args:
-        game_name (str): Name of the game module, it should match the name of a .py file
-        in the "./games" directory.
+        game_name (str): Name of the game module,
+        it should match the name of a package in the "./games" directory.
 
-        config (dict, MuZeroConfig, optional): Override the default config of the game.
+        config (dict, MuZeroConfig, optional):
+        Override the default config of the game.
 
-        split_resources_in (int, optional): Split the GPU usage when using concurent muzero instances.
+        split_resources_in (int, optional):
+        Split the GPU usage when using concurent muzero instances.
 
     Example:
-        >>> muzero = MuZero("cartpole")
-        >>> muzero.train()
-        >>> muzero.test(render=True)
+        # >>> muzero = MuZero("tictactoe")
+        # >>> muzero.train()
+        # >>> muzero.test(render=True)
     """
 
     def __init__(self, game_name, config=None, split_resources_in=1):
@@ -47,7 +50,8 @@ class MuZero:
             self.config = game_module.MuZeroConfig()
         except ModuleNotFoundError as err:
             print(
-                f'{game_name} is not a supported game name, try "cartpole" or refer to the documentation for adding a new game.'
+                f'{game_name} is not a supported game name, try "cartpole" or '
+                f'refer to the documentation for adding a new game.'
             )
             raise err
 
@@ -59,7 +63,8 @@ class MuZero:
                         setattr(self.config, param, value)
                     else:
                         raise AttributeError(
-                            f"{game_name} config has no attribute '{param}'. Check the config file for the complete list of parameters."
+                            f"{game_name} config has no attribute '{param}'. "
+                            f"Check the config file for the complete list of parameters."
                         )
             else:
                 self.config = config
@@ -75,7 +80,8 @@ class MuZero:
             or self.config.reanalyse_on_gpu
         ):
             raise ValueError(
-                "Inconsistent MuZeroConfig: max_num_gpus = 0 but GPU requested by selfplay_on_gpu or train_on_gpu or reanalyse_on_gpu."
+                "Inconsistent MuZeroConfig: max_num_gpus = 0 but GPU requested by "
+                "selfplay_on_gpu or train_on_gpu or reanalyse_on_gpu."
             )
         if (
             self.config.selfplay_on_gpu
@@ -632,11 +638,7 @@ if __name__ == "__main__":
     else:
         print("\nWelcome to MuZero! Here's a list of games:")
         # Let user pick a game
-        games = [
-            filename.stem
-            for filename in sorted(list((pathlib.Path.cwd() / "games").glob("*.py")))
-            if filename.name != "abstract_game.py"
-        ]
+        games = list(sorted([name for _, name, _ in pkgutil.iter_modules(['games']) if name != 'abstract_game']))
         for i in range(len(games)):
             print(f"{i}. {games[i]}")
         choice = input("Enter a number to choose the game: ")
